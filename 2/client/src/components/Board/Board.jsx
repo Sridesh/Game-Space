@@ -52,6 +52,8 @@ function Board({ name }) {
 
   useEffect(() => {
     if (error || success !== "") {
+      setOpenModal(true);
+      setBackDropOpen(false);
       if (error) {
         setRes("Incorrect Answer. Try Again");
       } else if (success === "Solution is already recognized") {
@@ -59,9 +61,6 @@ function Board({ name }) {
       } else {
         setRes("Congratulations! You found a solution");
       }
-
-      setOpenModal(true);
-      setBackDropOpen(false);
     }
   }, [error, success]);
 
