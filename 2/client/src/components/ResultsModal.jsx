@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Modal from "@mui/material/Modal";
-import { useEffect, useState } from "react";
 
 import fail from "../Assets/fail.jpg";
 import none from "../Assets/win.jpg";
@@ -13,7 +12,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
+  width: "fit-content",
   bgcolor: "background.paper",
   borderRadius: "5px",
   boxShadow: 24,
@@ -23,18 +22,10 @@ const style = {
 };
 
 export default function ResultsModal({ openModal, result }) {
-  const [open, setOpen] = useState(openModal);
-  const handleClose = () => setOpen(false);
-
-  useEffect(() => {
-    setOpen(openModal);
-  }, [openModal]);
-
   return (
     <div>
       <Modal
-        open={open}
-        // onClose={handleClose}
+        open={openModal} // Use the openModal prop directly
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >

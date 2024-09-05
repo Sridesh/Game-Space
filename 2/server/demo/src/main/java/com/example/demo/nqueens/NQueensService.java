@@ -3,6 +3,7 @@
 package com.example.demo.nqueens;
 
 import jakarta.annotation.PostConstruct;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,18 @@ public class NQueensService {
     public void init() {
         int[] board = new int[N];
         generateSolutions(board, 0);
+
+
+    }
+
+    @Transactional
+    public void clearAndRegenerateSolutions() {
+
+        recognizedSolutionRepository.deleteAll();
+
+        solutions.clear();
+        int[] board = new int[N];
+        generateSolutions(board, 0);
     }
 
     private void generateSolutions(int[] board, int row) {
@@ -39,6 +52,53 @@ public class NQueensService {
             }
         }
     }
+
+    /////////////////////////////////////////////////
+
+    @PostConstruct
+    public void init() {
+        generateSolutionsThreaded();
+    }
+
+    private void generateSolutionsThreaded() {
+        executor = Executors.newFixedThreadPool(THREAD_COUNT);
+
+        for (int col = 0; col < N; col++) {
+            final int startingCol = col;
+            executor.submit(() -> {
+                int[] board = new int[N];
+                board[0] = startingCol;
+                generateSolutions(board, 1);
+            });
+        }
+
+
+        executor.shutdown();
+        try {
+            executor.awaitTermination(1, TimeUnit.HOURS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void generateSolutions(int[] board, int row) {
+        if (row == N) {
+            synchronized (solutions) { 
+                solutions.add(board.clone());
+            }
+            return;
+        }
+
+        for (int col = 0; col < N; col++) {
+            if (isSafe(board, row, col)) {
+                board[row] = col;
+                generateSolutions(board, row + 1);
+            }
+        }
+    }
+
+    ///////////////////////////////
 
     private boolean isSafe(int[] board, int row, int col) {
         for (int i = 0; i < row; i++) {
@@ -64,6 +124,9 @@ public class NQueensService {
                 RecognizedSolution recognizedSolution = new RecognizedSolution(solutionStr, playerName, timeTaken);
                 recognizedSolutionRepository.save(recognizedSolution);
                 solutions.remove(solution);
+                if(solutions.size()==0){
+                    clearAndRegenerateSolutions();
+                }
                 return "valid";
             }
         }
