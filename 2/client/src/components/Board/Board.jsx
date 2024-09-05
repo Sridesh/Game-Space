@@ -127,7 +127,7 @@ function Board({ name }) {
         );
 
         console.log(response);
-        setRes(response.data);
+        setSuccess(response.data);
       } catch (error) {
         console.log(error);
         setError(true);
