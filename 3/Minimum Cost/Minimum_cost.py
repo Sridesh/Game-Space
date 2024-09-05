@@ -65,7 +65,7 @@ def solve_hungarian():
         insert_data(num_tasks, time_taken, timestamp)
     
     except ValueError :
-        messagebox.showerror("Invalid Input", "Only positive integers allowed.")
+        messagebox.showerror("Invalid Input", "Value Entered is Not supported")
 
 #Funtion definition of substracting Row minima        
 
